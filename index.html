@@ -259,10 +259,16 @@ var APP = (function() {
 
   // ── Claude scan ──────────────────────────────────────────────
   function scanPDF(b64, part) {
-    var prompt = 'Search this Ricoh parts catalog PDF for part number: ' + part + '\n\n'
-      + 'Part numbers appear as codes like "D0BQ1230" or with index prefix "13.D0BQ1230".\n\n'
-      + 'If found reply ONLY with this JSON:\n{"found":true,"description":"PART NAME","page":12,"section":"U001 EXTERIOR"}\n\n'
-      + 'If not found reply ONLY with:\n{"found":false}';
+    var prompt = 'Search this entire Ricoh parts catalog PDF for part number: ' + part + '\n\n'
+      + 'This catalog contains both diagram pages (with part numbers as labels on exploded diagrams) '
+      + 'and text index pages (with part numbers listed alphabetically). Search BOTH thoroughly.\n\n'
+      + 'Part numbers appear in formats like:\n'
+      + '- "D0BN2242" as a label on a diagram\n'
+      + '- "D0BN2242" in a text parts list\n'
+      + '- With a section prefix like "U006_S003 D0BN2242"\n\n'
+      + 'If found ANYWHERE in the document reply ONLY with this JSON:\n'
+      + '{"found":true,"description":"PART NAME","page":12,"section":"U006 PCDU"}\n\n'
+      + 'If not found anywhere reply ONLY with:\n{"found":false}';
 
     return fetch(CLAUDE_URL, {
       method: 'POST',
@@ -284,7 +290,7 @@ var APP = (function() {
   }
 
   // ── Folder validation ────────────────────────────────────────
-  var VALID = /^(IM-[A-Z]\d{4}[A-Z]?)(-[A-Z]{2}\d{3,4}[A-Z]?)?$|^D\d{3}(-D\d{3})?$/i;
+  var VALID = /^(IM-[A-Z]?\d{3,4}[A-Z+]?)(-[A-Z]{2}\d{3,4}[A-Z]?)?$|^(MP|MPC|SP|IM)-\d{3,4}[A-Z+]*(-[A-Z]{2}\d{3,4}[A-Z]?)?$|^D\d{3}(-D\d{3})?$/i;
   function validateFolders(names) {
     return names.filter(function(n) { return !VALID.test(n); }).map(function(n) {
       var r = 'Unexpected format.';
