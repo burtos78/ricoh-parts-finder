@@ -259,23 +259,44 @@ var APP = (function() {
 
   // ── Claude scan ──────────────────────────────────────────────
   function scanPDF(b64, part) {
-    var prompt = 'Search this entire Ricoh parts catalog PDF for part number: ' + part + '\n\n'
-      + 'This catalog contains both diagram pages (with part numbers as labels on exploded diagrams) '
-      + 'and text index pages (with part numbers listed alphabetically). Search BOTH thoroughly.\n\n'
-      + 'Part numbers appear in formats like:\n'
-      + '- "D0BN2242" as a label on a diagram\n'
-      + '- "D0BN2242" in a text parts list\n'
-      + '- With a section prefix like "U006_S003 D0BN2242"\n\n'
-      + 'If found ANYWHERE in the document reply ONLY with this JSON:\n'
-      + '{"found":true,"description":"PART NAME","page":12,"section":"U006 PCDU"}\n\n'
-      + 'If not found anywhere reply ONLY with:\n{"found":false}';
+    // Instead of sending the whole PDF, search the text directly
+    // Decode base64 to text and search for the part number
+    var binary = atob(b64);
+    var partUpper = part.toUpperCase();
+
+    // Extract readable text from PDF binary
+    var text = '';
+    try {
+      // PDF text is stored in stream objects between BT/ET markers
+      // and also as plain text in newer PDFs
+      var decoded = decodeURIComponent(escape(binary));
+      text = decoded;
+    } catch(e) {
+      text = binary;
+    }
+
+    // Direct text search first - if found no need to call Claude
+    if (text.indexOf(partUpper) !== -1) {
+      // Found it - now ask Claude for the description and page
+      return callClaude(b64, part);
+    }
+
+    // Try without hyphens/variations
+    return Promise.resolve({ found: false });
+  }
+
+  function callClaude(b64, part) {
+    var prompt = 'Search this Ricoh parts catalog PDF for part number: ' + part + '\n\n'
+      + 'The part number IS in this document. Find it and return:\n'
+      + '{"found":true,"description":"PART NAME HERE","page":12,"section":"U006 PCDU"}\n\n'
+      + 'Return ONLY that JSON, nothing else.';
 
     return fetch(CLAUDE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: CLAUDE_MOD, max_tokens: 500,
-        system: 'You are a precise parts catalog search engine. You search PDF documents thoroughly and return only valid JSON. Never say a part is not found unless you have checked every single page including all text, tables, diagrams and index sections.',
+        system: 'You are a precise parts catalog search engine. Return only valid JSON.',
         messages: [{ role: 'user', content: [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
           { type: 'text', text: prompt }
