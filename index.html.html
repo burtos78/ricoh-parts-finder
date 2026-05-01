@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ricoh Parts Finder</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; min-height: 100vh; }
+  .header { background: #1a1a1a; padding: 1.25rem 2rem; display: flex; align-items: center; gap: 12px; }
+  .header-logo { width: 32px; height: 32px; background: #e63; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .header-logo svg { width: 18px; height: 18px; fill: white; }
+  .header h1 { color: white; font-size: 17px; font-weight: 500; }
+  .header span { color: #888; font-size: 13px; margin-left: 4px; }
+  .header-user { margin-left: auto; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 8px; }
+  .signout-btn { background: #333; border: none; color: #aaa; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+  .signout-btn:hover { background: #444; color: white; }
+  .main { max-width: 780px; margin: 2.5rem auto; padding: 0 1.5rem; }
+  .search-card { background: white; border-radius: 12px; border: 0.5px solid #e0e0e0; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .search-label { font-size: 13px; color: #666; margin-bottom: 8px; display: block; }
+  .search-row { display: flex; gap: 10px; }
+  .search-row input {
+    flex: 1; height: 42px; border: 1px solid #ddd; border-radius: 8px;
+    padding: 0 14px; font-size: 15px; font-family: 'SF Mono', 'Consolas', monospace;
+    letter-spacing: 0.5px; outline: none; text-transform: uppercase; transition: border-color 0.15s;
+  }
+  .search-row input:focus { border-color: #e63; }
+  .search-row input::placeholder { font-family: -apple-system, sans-serif; text-transform: none; letter-spacing: 0; color: #bbb; }
+  .search-btn {
+    height: 42px; padding: 0 22px; background: #e63; color: white; border: none;
+    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .search-btn:hover { background: #d52; }
+  .search-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .login-btn {
+    width: 100%; height: 42px; background: #0078d4; color: white; border: none;
+    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s;
+  }
+  .login-btn:hover { background: #006cbf; }
+  .info-row { margin-top: 10px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px; }
+  .info-dot { width: 7px; height: 7px; border-radius: 50%; background: #2a9; display: inline-block; }
+  .status-bar { font-size: 13px; color: #666; padding: 0.5rem 0 1rem; min-height: 28px; }
+  .status-bar.searching { color: #e63; }
+  .status-bar.done { color: #2a9; }
+  .status-bar.error { color: #c44; }
+  .result-card {
+    background: white; border-radius: 10px; border: 0.5px solid #e8e8e8;
+    padding: 1rem 1.25rem; margin-bottom: 10px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: start;
+  }
+  .result-card.not-found { border-color: #f0ddd8; background: #fffaf9; }
+  .model-name { font-size: 15px; font-weight: 500; color: #1a1a1a; }
+  .part-desc { font-size: 13px; color: #555; margin-top: 3px; }
+  .part-section { font-size: 12px; color: #999; margin-top: 2px; }
+  .page-badge {
+    background: #f0f0ee; border-radius: 6px; padding: 3px 10px;
+    font-size: 12px; color: #555; font-weight: 500; white-space: nowrap; align-self: start; margin-top: 2px;
+  }
+  .not-found .page-badge { background: #f8ece9; color: #c66; }
+  .found-count { font-size: 12px; color: #2a9; font-weight: 500; }
+  .results-header { font-size: 13px; color: #888; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 0.5px solid #eee; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #bbb; }
+  .empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #eee; border-top-color: #e63; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .progress-wrap { margin-top: 12px; }
+  .progress-label { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+  .progress-bar { height: 3px; background: #f0f0ee; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #e63; border-radius: 2px; transition: width 0.4s; }
+  .warn-box { background:#fffbe6; border:1px solid #ffe58f; border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; font-size:13px; color:#7d5a00; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24"><path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>
+  </div>
+  <h1>Ricoh Parts Finder <span>— Cross-Model Lookup</span></h1>
+  <div class="header-user" id="headerUser" style="display:none">
+    <span id="userName"></span>
+    <button class="signout-btn" onclick="signOut()">Sign out</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="search-card" id="loginCard">
+    <label class="search-label">Sign in with your Tasprint Microsoft account to get started</label>
+    <button class="login-btn" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+
+  <div class="search-card" id="searchCard" style="display:none">
+    <label class="search-label">Enter a Ricoh part number to find which models it appears in</label>
+    <div class="search-row">
+      <input type="text" id="partInput" placeholder="e.g. D0BQ1230" maxlength="20" />
+      <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+    <div class="info-row">
+      <span class="info-dot"></span>
+      Connected to <strong>rbct.sharepoint.com</strong> — Service Group / Ricoh-Parts
+    </div>
+    <div class="progress-wrap" id="progressWrap" style="display:none">
+      <div class="progress-label" id="progressLabel">Scanning...</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar"></div>
+  <div id="resultsArea"></div>
+</div>
+
+<script>
+(function() {
+  // ── Config ───────────────────────────────────────────────────
+  var CFG = {
+    clientId:  'face6b00-c3a6-486a-814e-03f9f846b848',
+    tenantId:  'd00c4b77-ed02-46bf-8ad5-15e3353d1444',
+    host:      'rbct.sharepoint.com',
+    site:      'ServiceGroup',
+    folder:    'Ricoh-Parts',
+    graph:     'https://graph.microsoft.com/v1.0',
+    claude:    'https://api.anthropic.com/v1/messages',
+    model:     'claude-sonnet-4-20250514',
+    scopes:    ['Files.Read.All', 'Sites.Read.All', 'User.Read']
+  };
+
+  var msalApp = new msal.PublicClientApplication({
+    auth: {
+      clientId:    CFG.clientId,
+      authority:   'https://login.microsoftonline.com/' + CFG.tenantId,
+          redirectUri: 'https://rbct.sharepoint.com/sites/ServiceGroup/Documents/Tools/ricoh_parts_finder.html'
+    },
+    cache: { cacheLocation: 'sessionStorage' }
+  });
+
+  var searching = false;
+
+  // ── Init ─────────────────────────────────────────────────────
+  msalApp.handleRedirectPromise().then(function(resp) {
+    if (resp) setAccount(resp.account);
+    var accounts = msalApp.getAllAccounts();
+    if (accounts.length > 0) setAccount(accounts[0]);
+  }).catch(function(e) {
+    showStatus('Login error: ' + e.message, 'error');
+  });
+
+  document.getElementById('searchBtn').addEventListener('click', startSearch);
+  document.getElementById('partInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') startSearch();
+  });
+  document.getElementById('partInput').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+  });
+
+  // ── Auth ──────────────────────────────────────────────────────
+  function signIn() {
+    showStatus('Initialising login...', 'searching');
+    console.log('signIn called');
+    console.log('MSAL instance:', msalApp);
+    msalApp.loginRedirect({ scopes: CFG.scopes }).catch(function(e) {
+      console.error('loginRedirect error:', e);
+      showStatus('Sign in failed: ' + e.message, 'error');
+    });
+  }
+
+  function signOut() {
+    msalApp.logoutRedirect().catch(function(e) {
+      showStatus('Sign out failed: ' + e.message, 'error');
+    });
+  }
+
+  function setAccount(account) {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('searchCard').style.display = 'block';
+    document.getElementById('headerUser').style.display = 'flex';
+    document.getElementById('userName').textContent = account.name || account.username;
+  }
+
+  function getToken() {
+    var accounts = msalApp.getAllAccounts();
+    if (!accounts.length) return Promise.reject(new Error('Not signed in'));
+    return msalApp.acquireTokenSilent({ scopes: CFG.scopes, account: accounts[0] })
+      .then(function(r) { return r.accessToken; })
+      .catch(function() {
+        return msalApp.acquireTokenPopup({ scopes: CFG.scopes })
+          .then(function(r) { return r.accessToken; });
+      });
+  }
+
+  // ── UI helpers ────────────────────────────────────────────────
+  function showStatus(msg, cls) {
+    var el = document.getElementById('statusBar');
+    el.className = 'status-bar ' + (cls || '');
+    el.innerHTML = msg;
+  }
+
+  function setProgress(pct, label) {
+    var wrap = document.getElementById('progressWrap');
+    if (pct === null) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    document.getElementById('progressLabel').textContent = label || '';
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Graph API ─────────────────────────────────────────────────
+  function graphGet(path) {
+    return getToken().then(function(token) {
+      return fetch(CFG.graph + path, {
+        headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' }
+      });
+    }).then(function(res) {
+      if (!res.ok) return res.text().then(function(t) { throw new Error('Graph ' + res.status + ': ' + t); });
+      return res.json();
+    });
+  }
+
+  function getSiteId() {
+    return graphGet('/sites/' + CFG.host + ':/sites/' + CFG.site).then(function(d) { return d.id; });
+  }
+
+  function getDriveId(siteId) {
+    return graphGet('/sites/' + siteId + '/drives').then(function(d) {
+      var doc = d.value.find(function(x) { return x.name === 'Documents'; }) || d.value[0];
+      return doc.id;
+    });
+  }
+
+  function getSubfolders(driveId) {
+    var enc = encodeURIComponent(CFG.folder);
+    return graphGet('/drives/' + driveId + '/root:/' + enc + ':/children?$select=id,name,folder,file').then(function(d) {
+      return d.value.filter(function(i) { return i.folder; });
+    });
+  }
+
+  function getPDFInFolder(driveId, folderPath) {
+    var enc = encodeURIComponent(folderPath);
+    return graphGet('/drives/' + driveId + '/root:/' + enc + ':/children?$select=id,name,file').then(function(d) {
+      return d.value.find(function(i) { return i.name.toLowerCase().endsWith('.pdf'); }) || null;
+    });
+  }
+
+  function downloadAsBase64(driveId, fileId) {
+    return getToken().then(function(token) {
+      return fetch(CFG.graph + '/drives/' + driveId + '/items/' + fileId + '/content', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+    }).then(function(res) {
+      if (!res.ok) throw new Error('Download failed: ' + res.status);
+      return res.arrayBuffer();
+    }).then(function(buf) {
+      var bytes = new Uint8Array(buf);
+      var bin = '';
+      for (var i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin);
+    });
+  }
+
+  // ── Claude PDF scan ───────────────────────────────────────────
+  function scanPDF(b64, part) {
+    var prompt = 'Search this Ricoh parts catalog PDF for part number: ' + part + '\n\n'
+      + 'Part numbers appear as standalone codes like "D0BQ1230" or with index prefix like "13.D0BQ1230".\n\n'
+      + 'If found reply with ONLY this JSON:\n'
+      + '{"found":true,"description":"PART NAME HERE","page":12,"section":"U001 EXTERIOR"}\n\n'
+      + 'If not found reply with ONLY:\n{"found":false}';
+
+    return fetch(CFG.claude, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: CFG.model, max_tokens: 200,
+        messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    }).then(function(res) {
+      if (!res.ok) return res.text().then(function(t) { throw new Error('Claude: ' + t); });
+      return res.json();
+    }).then(function(data) {
+      var text = data.content.map(function(b) { return b.text || ''; }).join('').trim().replace(/```json|```/g,'');
+      return JSON.parse(text);
+    });
+  }
+
+  // ── Folder name validation ────────────────────────────────────
+  var VALID = /^(IM-[A-Z]\d{4}[A-Z]?)(-[A-Z]{2}\d{3,4}[A-Z]?)?$|^D\d{3}(-D\d{3})?$/i;
+  function validateFolders(names) {
+    return names.filter(function(n) { return !VALID.test(n); }).map(function(n) {
+      var r = 'Unexpected format.';
+      if (/\s/.test(n))              r = 'Contains spaces — use hyphens instead.';
+      else if (/_/.test(n))          r = 'Contains underscores — use hyphens instead.';
+      else if (/[a-z]/.test(n))      r = 'Use uppercase letters (e.g. IM-C6000).';
+      else if ((n.match(/-/g)||[]).length > 2) r = 'Too many hyphens — should be IM-C6000-SR3320.';
+      else if (!/^IM-|^D\d/.test(n)) r = 'Should start with IM- or D followed by digits.';
+      return { name: n, reason: r };
+    });
+  }
+
+  // ── Model display ─────────────────────────────────────────────
+  function modelHtml(name, dimmed) {
+    var parts = name.split('-');
+    var base, option;
+    if (parts[0].toUpperCase() === 'IM' && parts.length >= 3) {
+      base = parts[0] + '-' + parts[1];
+      option = parts.slice(2).join('-') + ' Option';
+    } else {
+      base = name; option = null;
+    }
+    var nc = dimmed ? 'color:#bbb' : '';
+    var badge = option ? '<span style="font-size:12px;font-weight:400;margin-left:8px;padding:2px 7px;border-radius:4px;'
+      + (dimmed ? 'color:#ccc;background:#f8f8f8' : 'color:#e63;background:#fff0ec') + '">' + esc(option) + '</span>' : '';
+    return '<div class="model-name" style="' + nc + '">' + esc(base) + badge + '</div>';
+  }
+
+  // ── Main search ───────────────────────────────────────────────
+  function startSearch() {
+    if (searching) return;
+    var part = document.getElementById('partInput').value.trim().toUpperCase();
+    if (!part) { showStatus('Please enter a part number.', 'error'); return; }
+
+    searching = true;
+    document.getElementById('searchBtn').disabled = true;
+    document.getElementById('resultsArea').innerHTML = '';
+    setProgress(0, 'Connecting to SharePoint...');
+    showStatus('<span class="spinner"></span>Connecting to SharePoint...', 'searching');
+
+    var driveId;
+    getSiteId()
+      .then(function(sid) { return getDriveId(sid); })
+      .then(function(did) {
+        driveId = did;
+        showStatus('<span class="spinner"></span>Loading model folders...', 'searching');
+        return getSubfolders(driveId);
+      })
+      .then(function(folders) {
+        if (!folders.length) throw new Error('No subfolders found in Ricoh-Parts.');
+
+        var invalid = validateFolders(folders.map(function(f) { return f.name; }));
+        if (invalid.length) {
+          var w = document.createElement('div');
+          w.className = 'warn-box';
+          w.innerHTML = '<strong>⚠ Folder naming issues (' + invalid.length + '):</strong><br>'
+            + invalid.map(function(i) {
+              return '<div style="margin-bottom:3px"><code style="background:#fff3c4;padding:1px 5px;border-radius:3px">'
+                + esc(i.name) + '</code> — ' + esc(i.reason) + '</div>';
+            }).join('') + '<br><span style="color:#999">These folders will still be scanned.</span>';
+          document.getElementById('resultsArea').appendChild(w);
+        }
+
+        var results = [], total = folders.length;
+
+        function next(i) {
+          if (i >= total) {
+            setProgress(null);
+            renderResults(results, part);
+            searching = false;
+            document.getElementById('searchBtn').disabled = false;
+            return;
+          }
+          var f = folders[i];
+          setProgress(5 + Math.round((i / total) * 90), 'Scanning ' + f.name + ' (' + (i+1) + ' of ' + total + ')');
+          showStatus('<span class="spinner"></span>Scanning <strong>' + esc(f.name) + '</strong> — ' + (i+1) + ' of ' + total, 'searching');
+
+          getPDFInFolder(driveId, CFG.folder + '/' + f.name)
+            .then(function(pdf) {
+              if (!pdf) { results.push({ model: f.name, found: false, error: 'No PDF in folder' }); next(i+1); return; }
+              downloadAsBase64(driveId, pdf.id)
+                .then(function(b64) { return scanPDF(b64, part); })
+                .then(function(r) { results.push(Object.assign({ model: f.name }, r)); next(i+1); })
+                .catch(function(e) { results.push({ model: f.name, found: false, error: e.message }); next(i+1); });
+            })
+            .catch(function(e) { results.push({ model: f.name, found: false, error: e.message }); next(i+1); });
+        }
+        next(0);
+      })
+      .catch(function(e) {
+        setProgress(null);
+        showStatus('&#9888; ' + e.message, 'error');
+        searching = false;
+        document.getElementById('searchBtn').disabled = false;
+      });
+  }
+
+  // ── Render ────────────────────────────────────────────────────
+  function renderResults(results, part) {
+    var found = results.filter(function(r) { return r.found; });
+    var notFound = results.filter(function(r) { return !r.found; });
+    var area = document.getElementById('resultsArea');
+
+    if (!found.length) {
+      showStatus('Part <strong>' + esc(part) + '</strong> not found in any of the ' + results.length + ' models scanned.', 'error');
+      area.innerHTML += '<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><p>Part <strong>' + esc(part) + '</strong> not found in any of the ' + results.length + ' models scanned.</p></div>';
+      return;
+    }
+
+    showStatus('Found <strong>' + esc(part) + '</strong> in <strong>' + found.length + '</strong> of ' + results.length + ' models.', 'done');
+    var html = '<div class="results-header"><strong>' + esc(part) + '</strong> — matched in ' + found.length + ' model' + (found.length>1?'s':'') + ' &nbsp;<span class="found-count">✓ ' + found.length + ' match' + (found.length>1?'es':'') + '</span></div>';
+
+    found.forEach(function(r) {
+      html += '<div class="result-card"><div>' + modelHtml(r.model, false)
+        + '<div class="part-desc">' + esc(r.description) + '</div>'
+        + (r.section ? '<div class="part-section">' + esc(r.section) + '</div>' : '')
+        + '</div><div class="page-badge">Page ' + (r.page||'—') + '</div></div>';
+    });
+
+    if (notFound.length) {
+      html += '<details style="margin-top:1rem"><summary style="font-size:13px;color:#bbb;cursor:pointer;list-style:none;padding:4px 0">▸ Not found in ' + notFound.length + ' other model' + (notFound.length>1?'s':'') + '</summary><div style="margin-top:8px">';
+      notFound.forEach(function(r) {
+        html += '<div class="result-card not-found"><div>' + modelHtml(r.model, true)
+          + (r.error ? '<div class="part-section">' + esc(r.error) + '</div>' : '')
+          + '</div><div class="page-badge">Not found</div></div>';
+      });
+      html += '</div></details>';
+    }
+    area.innerHTML += html;
+  }
+
+})();
+</script>
+</body>
+</html>
