@@ -274,7 +274,8 @@ var APP = (function() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: CLAUDE_MOD, max_tokens: 200,
+        model: CLAUDE_MOD, max_tokens: 500,
+        system: 'You are a precise parts catalog search engine. You search PDF documents thoroughly and return only valid JSON. Never say a part is not found unless you have checked every single page including all text, tables, diagrams and index sections.',
         messages: [{ role: 'user', content: [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
           { type: 'text', text: prompt }
