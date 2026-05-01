@@ -19,26 +19,13 @@
   .search-card { background: white; border-radius: 12px; border: 0.5px solid #e0e0e0; padding: 1.5rem; margin-bottom: 1.5rem; }
   .search-label { font-size: 13px; color: #666; margin-bottom: 8px; display: block; }
   .search-row { display: flex; gap: 10px; }
-  .search-row input {
-    flex: 1; height: 42px; border: 1px solid #ddd; border-radius: 8px;
-    padding: 0 14px; font-size: 15px; font-family: 'SF Mono', 'Consolas', monospace;
-    letter-spacing: 0.5px; outline: none; text-transform: uppercase; transition: border-color 0.15s;
-  }
+  .search-row input { flex: 1; height: 42px; border: 1px solid #ddd; border-radius: 8px; padding: 0 14px; font-size: 15px; font-family: 'SF Mono', 'Consolas', monospace; letter-spacing: 0.5px; outline: none; text-transform: uppercase; transition: border-color 0.15s; }
   .search-row input:focus { border-color: #e63; }
   .search-row input::placeholder { font-family: -apple-system, sans-serif; text-transform: none; letter-spacing: 0; color: #bbb; }
-  .search-btn {
-    height: 42px; padding: 0 22px; background: #e63; color: white; border: none;
-    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-    transition: background 0.15s; white-space: nowrap;
-  }
+  .search-btn { height: 42px; padding: 0 22px; background: #e63; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
   .search-btn:hover { background: #d52; }
   .search-btn:disabled { background: #ccc; cursor: not-allowed; }
-  .login-btn {
-    width: 100%; height: 42px; background: #0078d4; color: white; border: none;
-    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background 0.15s;
-  }
+  .login-btn { width: 100%; height: 42px; background: #0078d4; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
   .login-btn:hover { background: #006cbf; }
   .info-row { margin-top: 10px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px; }
   .info-dot { width: 7px; height: 7px; border-radius: 50%; background: #2a9; display: inline-block; }
@@ -46,19 +33,12 @@
   .status-bar.searching { color: #e63; }
   .status-bar.done { color: #2a9; }
   .status-bar.error { color: #c44; }
-  .result-card {
-    background: white; border-radius: 10px; border: 0.5px solid #e8e8e8;
-    padding: 1rem 1.25rem; margin-bottom: 10px;
-    display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: start;
-  }
+  .result-card { background: white; border-radius: 10px; border: 0.5px solid #e8e8e8; padding: 1rem 1.25rem; margin-bottom: 10px; display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: start; }
   .result-card.not-found { border-color: #f0ddd8; background: #fffaf9; }
   .model-name { font-size: 15px; font-weight: 500; color: #1a1a1a; }
   .part-desc { font-size: 13px; color: #555; margin-top: 3px; }
   .part-section { font-size: 12px; color: #999; margin-top: 2px; }
-  .page-badge {
-    background: #f0f0ee; border-radius: 6px; padding: 3px 10px;
-    font-size: 12px; color: #555; font-weight: 500; white-space: nowrap; align-self: start; margin-top: 2px;
-  }
+  .page-badge { background: #f0f0ee; border-radius: 6px; padding: 3px 10px; font-size: 12px; color: #555; font-weight: 500; white-space: nowrap; align-self: start; margin-top: 2px; }
   .not-found .page-badge { background: #f8ece9; color: #c66; }
   .found-count { font-size: 12px; color: #2a9; font-weight: 500; }
   .results-header { font-size: 13px; color: #888; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 0.5px solid #eee; }
@@ -83,14 +63,14 @@
   <h1>Ricoh Parts Finder <span>— Cross-Model Lookup</span></h1>
   <div class="header-user" id="headerUser" style="display:none">
     <span id="userName"></span>
-    <button class="signout-btn" onclick="signOut()">Sign out</button>
+    <button class="signout-btn" id="signoutBtn">Sign out</button>
   </div>
 </div>
 
 <div class="main">
   <div class="search-card" id="loginCard">
     <label class="search-label">Sign in with your Tasprint Microsoft account to get started</label>
-    <button class="login-btn" onclick="signIn()">
+    <button class="login-btn" id="loginBtn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>
       Sign in with Microsoft
     </button>
@@ -117,98 +97,103 @@
 </div>
 
 <script>
-(function() {
-  // ── Config ───────────────────────────────────────────────────
-  var CFG = {
-    clientId:  'face6b00-c3a6-486a-814e-03f9f846b848',
-    tenantId:  'd00c4b77-ed02-46bf-8ad5-15e3353d1444',
-    host:      'rbct.sharepoint.com',
-    site:      'ServiceGroup',
-    folder:    'Ricoh-Parts',
-    graph:     'https://graph.microsoft.com/v1.0',
-    claude:    'https://api.anthropic.com/v1/messages',
-    model:     'claude-sonnet-4-20250514',
-    scopes:    ['Files.Read.All', 'Sites.Read.All', 'User.Read']
-  };
+var APP = (function() {
 
-  var msalApp = new msal.PublicClientApplication({
-    auth: {
-      clientId:    CFG.clientId,
-      authority:   'https://login.microsoftonline.com/' + CFG.tenantId,
-          redirectUri: 'https://burtos78.github.io/ricoh-parts-finder/'
-    },
-    cache: { cacheLocation: 'sessionStorage' }
-  });
+  // ── Config ──────────────────────────────────────────────────
+  var CLIENT_ID   = 'face6b00-c3a6-486a-814e-03f9f846b848';
+  var TENANT_ID   = 'd00c4b77-ed02-46bf-8ad5-15e3353d1444';
+  var REDIRECT    = 'https://burtos78.github.io/ricoh-parts-finder/';
+  var SCOPES      = 'Files.Read.All Sites.Read.All User.Read';
+  var GRAPH       = 'https://graph.microsoft.com/v1.0';
+  var CLAUDE_URL  = 'https://api.anthropic.com/v1/messages';
+  var CLAUDE_MOD  = 'claude-sonnet-4-20250514';
+  var SP_HOST     = 'rbct.sharepoint.com';
+  var SP_SITE     = 'ServiceGroup';
+  var SP_FOLDER   = 'Ricoh-Parts';
 
+  var token = null;
   var searching = false;
 
-  // Expose functions to global scope for button onclick handlers
-  window.signIn  = signIn;
-  window.signOut = signOut;
-  window.startSearch = startSearch;
-
-  // ── Init ─────────────────────────────────────────────────────
-  msalApp.handleRedirectPromise().then(function(resp) {
-    if (resp) setAccount(resp.account);
-    var accounts = msalApp.getAllAccounts();
-    if (accounts.length > 0) setAccount(accounts[0]);
-  }).catch(function(e) {
-    showStatus('Login error: ' + e.message, 'error');
-  });
-
-  document.getElementById('searchBtn').addEventListener('click', startSearch);
-  document.getElementById('partInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') startSearch();
-  });
-  document.getElementById('partInput').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toUpperCase();
-  });
-
-  // ── Auth ──────────────────────────────────────────────────────
-  function signIn() {
-    showStatus('Initialising login...', 'searching');
-    console.log('signIn called');
-    console.log('MSAL instance:', msalApp);
-    msalApp.loginRedirect({ scopes: CFG.scopes }).catch(function(e) {
-      console.error('loginRedirect error:', e);
-      showStatus('Sign in failed: ' + e.message, 'error');
-    });
+  // ── Boot ────────────────────────────────────────────────────
+  function boot() {
+    // Check if returning from Microsoft login with token in URL hash
+    if (window.location.hash && window.location.hash.indexOf('access_token') !== -1) {
+      var params = parseHash(window.location.hash);
+      if (params.access_token) {
+        token = params.access_token;
+        sessionStorage.setItem('rpf_token', token);
+        history.replaceState(null, '', window.location.pathname);
+        fetchUserName();
+        return;
+      }
+    }
+    // Check session storage
+    var stored = sessionStorage.getItem('rpf_token');
+    if (stored) {
+      token = stored;
+      var name = sessionStorage.getItem('rpf_user') || 'Signed in';
+      showApp(name);
+      return;
+    }
+    // Show login
+    showLogin();
   }
 
-  function signOut() {
-    msalApp.logoutRedirect().catch(function(e) {
-      showStatus('Sign out failed: ' + e.message, 'error');
+  function parseHash(hash) {
+    var result = {};
+    hash.replace(/^#/, '').split('&').forEach(function(part) {
+      var eq = part.indexOf('=');
+      if (eq > -1) result[part.slice(0, eq)] = decodeURIComponent(part.slice(eq + 1));
     });
+    return result;
   }
 
-  function setAccount(account) {
+  function fetchUserName() {
+    fetch(GRAPH + '/me', { headers: { Authorization: 'Bearer ' + token } })
+      .then(function(r) { return r.json(); })
+      .then(function(u) {
+        var name = u.displayName || u.userPrincipalName || 'Signed in';
+        sessionStorage.setItem('rpf_user', name);
+        showApp(name);
+      })
+      .catch(function() { showApp('Signed in'); });
+  }
+
+  function showLogin() {
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('searchCard').style.display = 'none';
+    document.getElementById('headerUser').style.display = 'none';
+  }
+
+  function showApp(name) {
     document.getElementById('loginCard').style.display = 'none';
     document.getElementById('searchCard').style.display = 'block';
     document.getElementById('headerUser').style.display = 'flex';
-    document.getElementById('userName').textContent = account.name || account.username;
+    document.getElementById('userName').textContent = name;
   }
 
-  function getToken() {
-    var accounts = msalApp.getAllAccounts();
-    if (!accounts.length) return Promise.reject(new Error('Not signed in'));
-    return msalApp.acquireTokenSilent({ scopes: CFG.scopes, account: accounts[0] })
-      .then(function(r) { return r.accessToken; })
-      .catch(function() {
-        return msalApp.acquireTokenPopup({ scopes: CFG.scopes })
-          .then(function(r) { return r.accessToken; });
-      });
+  function signIn() {
+    var url = 'https://login.microsoftonline.com/' + TENANT_ID + '/oauth2/v2.0/authorize'
+      + '?client_id='     + encodeURIComponent(CLIENT_ID)
+      + '&response_type=token'
+      + '&redirect_uri='  + encodeURIComponent(REDIRECT)
+      + '&scope='         + encodeURIComponent(SCOPES)
+      + '&response_mode=fragment'
+      + '&nonce='         + Math.random().toString(36).slice(2);
+    window.location.href = url;
   }
 
-  // ── Init ─────────────────────────────────────────────────────
-  document.getElementById('searchBtn').addEventListener('click', startSearch);
-  document.getElementById('partInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') startSearch();
-  });
-  document.getElementById('partInput').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toUpperCase();
-  });
-  init();
-  function showStatus(msg, cls) {
+  function signOut() {
+    token = null;
+    sessionStorage.removeItem('rpf_token');
+    sessionStorage.removeItem('rpf_user');
+    showLogin();
+    document.getElementById('resultsArea').innerHTML = '';
+    setStatus('', '');
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────
+  function setStatus(msg, cls) {
     var el = document.getElementById('statusBar');
     el.className = 'status-bar ' + (cls || '');
     el.innerHTML = msg;
@@ -223,137 +208,120 @@
   }
 
   function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // ── UI helpers ────────────────────────────────────────────────
-  function graphGet(path) {
-    return getToken().then(function(token) {
-      return fetch(CFG.graph + path, {
-        headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' }
-      });
-    }).then(function(res) {
-      if (!res.ok) return res.text().then(function(t) { throw new Error('Graph ' + res.status + ': ' + t); });
-      return res.json();
+  // ── Graph API ────────────────────────────────────────────────
+  function gGet(path) {
+    return fetch(GRAPH + path, {
+      headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' }
+    }).then(function(r) {
+      if (!r.ok) return r.text().then(function(t) { throw new Error('Graph ' + r.status + ': ' + t); });
+      return r.json();
     });
   }
 
   function getSiteId() {
-    return graphGet('/sites/' + CFG.host + ':/sites/' + CFG.site).then(function(d) { return d.id; });
+    return gGet('/sites/' + SP_HOST + ':/sites/' + SP_SITE).then(function(d) { return d.id; });
   }
 
   function getDriveId(siteId) {
-    return graphGet('/sites/' + siteId + '/drives').then(function(d) {
+    return gGet('/sites/' + siteId + '/drives').then(function(d) {
       var doc = d.value.find(function(x) { return x.name === 'Documents'; }) || d.value[0];
       return doc.id;
     });
   }
 
   function getSubfolders(driveId) {
-    var enc = encodeURIComponent(CFG.folder);
-    return graphGet('/drives/' + driveId + '/root:/' + enc + ':/children?$select=id,name,folder,file').then(function(d) {
+    return gGet('/drives/' + driveId + '/root:/' + encodeURIComponent(SP_FOLDER) + ':/children?$select=id,name,folder').then(function(d) {
       return d.value.filter(function(i) { return i.folder; });
     });
   }
 
-  function getPDFInFolder(driveId, folderPath) {
-    var enc = encodeURIComponent(folderPath);
-    return graphGet('/drives/' + driveId + '/root:/' + enc + ':/children?$select=id,name,file').then(function(d) {
+  function getPDF(driveId, folderPath) {
+    return gGet('/drives/' + driveId + '/root:/' + encodeURIComponent(folderPath) + ':/children?$select=id,name,file').then(function(d) {
       return d.value.find(function(i) { return i.name.toLowerCase().endsWith('.pdf'); }) || null;
     });
   }
 
-  function downloadAsBase64(driveId, fileId) {
-    return fetch(CFG.graph + '/drives/' + driveId + '/items/' + fileId + '/content', {
-      headers: { Authorization: 'Bearer ' + accessToken }
-    }).then(function(res) {
-      if (!res.ok) throw new Error('Download failed: ' + res.status);
-      return res.arrayBuffer();
+  function toBase64(driveId, fileId) {
+    return fetch(GRAPH + '/drives/' + driveId + '/items/' + fileId + '/content', {
+      headers: { Authorization: 'Bearer ' + token }
+    }).then(function(r) {
+      if (!r.ok) throw new Error('Download failed ' + r.status);
+      return r.arrayBuffer();
     }).then(function(buf) {
-      var bytes = new Uint8Array(buf);
-      var bin = '';
-      for (var i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
-      return btoa(bin);
+      var b = new Uint8Array(buf), s = '';
+      for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+      return btoa(s);
     });
   }
 
-  // ── Claude PDF scan ───────────────────────────────────────────
+  // ── Claude scan ──────────────────────────────────────────────
   function scanPDF(b64, part) {
     var prompt = 'Search this Ricoh parts catalog PDF for part number: ' + part + '\n\n'
-      + 'Part numbers appear as standalone codes like "D0BQ1230" or with index prefix like "13.D0BQ1230".\n\n'
-      + 'If found reply with ONLY this JSON:\n'
-      + '{"found":true,"description":"PART NAME HERE","page":12,"section":"U001 EXTERIOR"}\n\n'
-      + 'If not found reply with ONLY:\n{"found":false}';
+      + 'Part numbers appear as codes like "D0BQ1230" or with index prefix "13.D0BQ1230".\n\n'
+      + 'If found reply ONLY with this JSON:\n{"found":true,"description":"PART NAME","page":12,"section":"U001 EXTERIOR"}\n\n'
+      + 'If not found reply ONLY with:\n{"found":false}';
 
-    return fetch(CFG.claude, {
+    return fetch(CLAUDE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: CFG.model, max_tokens: 200,
+        model: CLAUDE_MOD, max_tokens: 200,
         messages: [{ role: 'user', content: [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
           { type: 'text', text: prompt }
         ]}]
       })
-    }).then(function(res) {
-      if (!res.ok) return res.text().then(function(t) { throw new Error('Claude: ' + t); });
-      return res.json();
-    }).then(function(data) {
-      var text = data.content.map(function(b) { return b.text || ''; }).join('').trim().replace(/```json|```/g,'');
-      return JSON.parse(text);
+    }).then(function(r) {
+      if (!r.ok) return r.text().then(function(t) { throw new Error('Claude: ' + t); });
+      return r.json();
+    }).then(function(d) {
+      var txt = d.content.map(function(b) { return b.text || ''; }).join('').trim().replace(/```json|```/g, '');
+      return JSON.parse(txt);
     });
   }
 
-  // ── Folder name validation ────────────────────────────────────
+  // ── Folder validation ────────────────────────────────────────
   var VALID = /^(IM-[A-Z]\d{4}[A-Z]?)(-[A-Z]{2}\d{3,4}[A-Z]?)?$|^D\d{3}(-D\d{3})?$/i;
   function validateFolders(names) {
     return names.filter(function(n) { return !VALID.test(n); }).map(function(n) {
       var r = 'Unexpected format.';
-      if (/\s/.test(n))              r = 'Contains spaces — use hyphens instead.';
-      else if (/_/.test(n))          r = 'Contains underscores — use hyphens instead.';
-      else if (/[a-z]/.test(n))      r = 'Use uppercase letters (e.g. IM-C6000).';
+      if (/\s/.test(n))  r = 'Contains spaces — use hyphens instead.';
+      else if (/_/.test(n)) r = 'Contains underscores — use hyphens instead.';
+      else if (/[a-z]/.test(n)) r = 'Use uppercase letters (e.g. IM-C6000).';
       else if ((n.match(/-/g)||[]).length > 2) r = 'Too many hyphens — should be IM-C6000-SR3320.';
-      else if (!/^IM-|^D\d/.test(n)) r = 'Should start with IM- or D followed by digits.';
       return { name: n, reason: r };
     });
   }
 
-  // ── Model display ─────────────────────────────────────────────
-  function modelHtml(name, dimmed) {
-    var parts = name.split('-');
-    var base, option;
-    if (parts[0].toUpperCase() === 'IM' && parts.length >= 3) {
-      base = parts[0] + '-' + parts[1];
-      option = parts.slice(2).join('-') + ' Option';
-    } else {
-      base = name; option = null;
-    }
-    var nc = dimmed ? 'color:#bbb' : '';
-    var badge = option ? '<span style="font-size:12px;font-weight:400;margin-left:8px;padding:2px 7px;border-radius:4px;'
-      + (dimmed ? 'color:#ccc;background:#f8f8f8' : 'color:#e63;background:#fff0ec') + '">' + esc(option) + '</span>' : '';
-    return '<div class="model-name" style="' + nc + '">' + esc(base) + badge + '</div>';
+  // ── Model display ────────────────────────────────────────────
+  function modelHtml(name, dim) {
+    var p = name.split('-');
+    var base = (p[0].toUpperCase() === 'IM' && p.length >= 3) ? p[0]+'-'+p[1] : name;
+    var opt  = (p[0].toUpperCase() === 'IM' && p.length >= 3) ? p.slice(2).join('-')+' Option' : null;
+    var nc = dim ? 'color:#bbb' : '';
+    var badge = opt ? '<span style="font-size:12px;font-weight:400;margin-left:8px;padding:2px 7px;border-radius:4px;'+(dim?'color:#ccc;background:#f8f8f8':'color:#e63;background:#fff0ec')+'">'+esc(opt)+'</span>' : '';
+    return '<div class="model-name" style="'+nc+'">'+esc(base)+badge+'</div>';
   }
 
-  // ── Main search ───────────────────────────────────────────────
+  // ── Search ───────────────────────────────────────────────────
   function startSearch() {
     if (searching) return;
     var part = document.getElementById('partInput').value.trim().toUpperCase();
-    if (!part) { showStatus('Please enter a part number.', 'error'); return; }
+    if (!part) { setStatus('Please enter a part number.', 'error'); return; }
 
     searching = true;
     document.getElementById('searchBtn').disabled = true;
     document.getElementById('resultsArea').innerHTML = '';
     setProgress(0, 'Connecting to SharePoint...');
-    showStatus('<span class="spinner"></span>Connecting to SharePoint...', 'searching');
+    setStatus('<span class="spinner"></span>Connecting to SharePoint...', 'searching');
 
     var driveId;
     getSiteId()
       .then(function(sid) { return getDriveId(sid); })
-      .then(function(did) {
-        driveId = did;
-        showStatus('<span class="spinner"></span>Loading model folders...', 'searching');
-        return getSubfolders(driveId);
-      })
+      .then(function(did) { driveId = did; return getSubfolders(did); })
       .then(function(folders) {
         if (!folders.length) throw new Error('No subfolders found in Ricoh-Parts.');
 
@@ -361,11 +329,9 @@
         if (invalid.length) {
           var w = document.createElement('div');
           w.className = 'warn-box';
-          w.innerHTML = '<strong>⚠ Folder naming issues (' + invalid.length + '):</strong><br>'
-            + invalid.map(function(i) {
-              return '<div style="margin-bottom:3px"><code style="background:#fff3c4;padding:1px 5px;border-radius:3px">'
-                + esc(i.name) + '</code> — ' + esc(i.reason) + '</div>';
-            }).join('') + '<br><span style="color:#999">These folders will still be scanned.</span>';
+          w.innerHTML = '<strong>⚠ Folder naming issues ('+invalid.length+'):</strong><br>'
+            + invalid.map(function(i) { return '<div><code style="background:#fff3c4;padding:1px 5px;border-radius:3px">'+esc(i.name)+'</code> — '+esc(i.reason)+'</div>'; }).join('')
+            + '<br><span style="color:#999">These folders will still be scanned.</span>';
           document.getElementById('resultsArea').appendChild(w);
         }
 
@@ -380,63 +346,72 @@
             return;
           }
           var f = folders[i];
-          setProgress(5 + Math.round((i / total) * 90), 'Scanning ' + f.name + ' (' + (i+1) + ' of ' + total + ')');
-          showStatus('<span class="spinner"></span>Scanning <strong>' + esc(f.name) + '</strong> — ' + (i+1) + ' of ' + total, 'searching');
+          setProgress(5 + Math.round((i/total)*90), 'Scanning '+f.name+' ('+(i+1)+' of '+total+')');
+          setStatus('<span class="spinner"></span>Scanning <strong>'+esc(f.name)+'</strong> — '+(i+1)+' of '+total, 'searching');
 
-          getPDFInFolder(driveId, CFG.folder + '/' + f.name)
+          getPDF(driveId, SP_FOLDER+'/'+f.name)
             .then(function(pdf) {
-              if (!pdf) { results.push({ model: f.name, found: false, error: 'No PDF in folder' }); next(i+1); return; }
-              downloadAsBase64(driveId, pdf.id)
+              if (!pdf) { results.push({model:f.name,found:false,error:'No PDF in folder'}); next(i+1); return; }
+              toBase64(driveId, pdf.id)
                 .then(function(b64) { return scanPDF(b64, part); })
-                .then(function(r) { results.push(Object.assign({ model: f.name }, r)); next(i+1); })
-                .catch(function(e) { results.push({ model: f.name, found: false, error: e.message }); next(i+1); });
+                .then(function(r) { results.push(Object.assign({model:f.name}, r)); next(i+1); })
+                .catch(function(e) { results.push({model:f.name,found:false,error:e.message}); next(i+1); });
             })
-            .catch(function(e) { results.push({ model: f.name, found: false, error: e.message }); next(i+1); });
+            .catch(function(e) { results.push({model:f.name,found:false,error:e.message}); next(i+1); });
         }
         next(0);
       })
       .catch(function(e) {
         setProgress(null);
-        showStatus('&#9888; ' + e.message, 'error');
+        setStatus('&#9888; '+e.message, 'error');
         searching = false;
         document.getElementById('searchBtn').disabled = false;
       });
   }
 
-  // ── Render ────────────────────────────────────────────────────
+  // ── Render ───────────────────────────────────────────────────
   function renderResults(results, part) {
     var found = results.filter(function(r) { return r.found; });
     var notFound = results.filter(function(r) { return !r.found; });
     var area = document.getElementById('resultsArea');
 
     if (!found.length) {
-      showStatus('Part <strong>' + esc(part) + '</strong> not found in any of the ' + results.length + ' models scanned.', 'error');
-      area.innerHTML += '<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><p>Part <strong>' + esc(part) + '</strong> not found in any of the ' + results.length + ' models scanned.</p></div>';
+      setStatus('Part <strong>'+esc(part)+'</strong> not found in any of the '+results.length+' models scanned.', 'error');
+      area.innerHTML += '<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><p>Part <strong>'+esc(part)+'</strong> not found in any of the '+results.length+' models.</p></div>';
       return;
     }
 
-    showStatus('Found <strong>' + esc(part) + '</strong> in <strong>' + found.length + '</strong> of ' + results.length + ' models.', 'done');
-    var html = '<div class="results-header"><strong>' + esc(part) + '</strong> — matched in ' + found.length + ' model' + (found.length>1?'s':'') + ' &nbsp;<span class="found-count">✓ ' + found.length + ' match' + (found.length>1?'es':'') + '</span></div>';
+    setStatus('Found <strong>'+esc(part)+'</strong> in <strong>'+found.length+'</strong> of '+results.length+' models.', 'done');
+    var html = '<div class="results-header"><strong>'+esc(part)+'</strong> — matched in '+found.length+' model'+(found.length>1?'s':'')+' &nbsp;<span class="found-count">✓ '+found.length+' match'+(found.length>1?'es':'')+'</span></div>';
 
     found.forEach(function(r) {
-      html += '<div class="result-card"><div>' + modelHtml(r.model, false)
-        + '<div class="part-desc">' + esc(r.description) + '</div>'
-        + (r.section ? '<div class="part-section">' + esc(r.section) + '</div>' : '')
-        + '</div><div class="page-badge">Page ' + (r.page||'—') + '</div></div>';
+      html += '<div class="result-card"><div>'+modelHtml(r.model,false)
+        +'<div class="part-desc">'+esc(r.description)+'</div>'
+        +(r.section?'<div class="part-section">'+esc(r.section)+'</div>':'')
+        +'</div><div class="page-badge">Page '+(r.page||'—')+'</div></div>';
     });
 
     if (notFound.length) {
-      html += '<details style="margin-top:1rem"><summary style="font-size:13px;color:#bbb;cursor:pointer;list-style:none;padding:4px 0">▸ Not found in ' + notFound.length + ' other model' + (notFound.length>1?'s':'') + '</summary><div style="margin-top:8px">';
+      html += '<details style="margin-top:1rem"><summary style="font-size:13px;color:#bbb;cursor:pointer;list-style:none;padding:4px 0">▸ Not found in '+notFound.length+' other model'+(notFound.length>1?'s':'')+'</summary><div style="margin-top:8px">';
       notFound.forEach(function(r) {
-        html += '<div class="result-card not-found"><div>' + modelHtml(r.model, true)
-          + (r.error ? '<div class="part-section">' + esc(r.error) + '</div>' : '')
-          + '</div><div class="page-badge">Not found</div></div>';
+        html += '<div class="result-card not-found"><div>'+modelHtml(r.model,true)+(r.error?'<div class="part-section">'+esc(r.error)+'</div>':'')+'</div><div class="page-badge">Not found</div></div>';
       });
       html += '</div></details>';
     }
     area.innerHTML += html;
   }
 
+  // ── Wire up buttons ──────────────────────────────────────────
+  document.getElementById('loginBtn').addEventListener('click', signIn);
+  document.getElementById('signoutBtn').addEventListener('click', signOut);
+  document.getElementById('searchBtn').addEventListener('click', startSearch);
+  document.getElementById('partInput').addEventListener('keydown', function(e) { if (e.key==='Enter') startSearch(); });
+  document.getElementById('partInput').addEventListener('input', function(e) { e.target.value = e.target.value.toUpperCase(); });
+
+  // ── Start ────────────────────────────────────────────────────
+  boot();
+
+  return {};
 })();
 </script>
 </body>
